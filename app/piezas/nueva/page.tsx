@@ -1,11 +1,8 @@
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Header from "@/components/Header";
-import SearchBar from "@/components/SearchBar";
-import FilterPanel from "@/components/FilterPanel";
-import PiezaCard from "@/components/PiezaCard";
 import PiezaForm from "@/components/piezas/PiezaForm";
+import SidebarPiezas from "@/components/piezas/SidebarPiezas";
 import { Pieza } from "@/lib/types";
 
 export default async function NuevaPiezaPage({
@@ -49,17 +46,7 @@ export default async function NuevaPiezaPage({
     <div>
       <Header />
       <div className="mx-auto flex max-w-6xl gap-6 px-6 py-8">
-        <aside className="w-72 shrink-0 space-y-3">
-          <Suspense fallback={<div className="h-10 rounded-lg bg-paperLight" />}>
-            <SearchBar />
-            <FilterPanel culturas={culturas} />
-          </Suspense>
-          <div className="flex flex-col gap-2 pt-2">
-            {(lista as Pieza[] | null)?.map((p) => (
-              <PiezaCard key={p.id} pieza={p} compacta />
-            ))}
-          </div>
-        </aside>
+        <SidebarPiezas lista={(lista as Pieza[] | null) ?? []} culturas={culturas} puedeCrear />
 
         <main className="min-w-0 flex-1">
           <h1 className="mb-4 text-xl font-bold text-ink">Nueva pieza</h1>

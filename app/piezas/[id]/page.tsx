@@ -1,10 +1,7 @@
-import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import Header from "@/components/Header";
-import SearchBar from "@/components/SearchBar";
-import FilterPanel from "@/components/FilterPanel";
-import PiezaCard from "@/components/PiezaCard";
 import PiezaDetailView from "@/components/PiezaDetailView";
+import SidebarPiezas from "@/components/piezas/SidebarPiezas";
 import { Pieza } from "@/lib/types";
 import { SELECT_PIEZA } from "@/lib/queries";
 import { notFound } from "next/navigation";
@@ -58,17 +55,12 @@ export default async function FichaPage({
     <div>
       <Header />
       <div className="mx-auto flex max-w-6xl gap-6 px-6 py-8">
-        <aside className="w-72 shrink-0 space-y-3">
-          <Suspense fallback={<div className="h-10 rounded-lg bg-paperLight" />}>
-            <SearchBar />
-            <FilterPanel culturas={culturas} />
-          </Suspense>
-          <div className="flex flex-col gap-2 pt-2">
-            {(lista as Pieza[] | null)?.map((p) => (
-              <PiezaCard key={p.id} pieza={p} compacta activa={p.id === id} />
-            ))}
-          </div>
-        </aside>
+        <SidebarPiezas
+          lista={(lista as Pieza[] | null) ?? []}
+          culturas={culturas}
+          activaId={id}
+          puedeCrear={Boolean(user)}
+        />
 
         <main className="min-w-0 flex-1">
           <PiezaDetailView
