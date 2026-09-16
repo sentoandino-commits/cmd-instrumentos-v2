@@ -84,7 +84,12 @@ export default async function CatalogoPage({
         // Piezas/Papers + lista compacta) que el resto de las páginas,
         // para que cambiar de sección no salte de layout.
         <div className="mx-auto flex max-w-6xl gap-6 px-6 py-8">
-          <SidebarPiezas lista={(piezas as Pieza[] | null) ?? []} culturas={culturas} puedeCrear />
+          <SidebarPiezas
+            lista={(piezas as Pieza[] | null) ?? []}
+            culturas={culturas}
+            puedeCrear
+            mostrarLista={false}
+          />
           <main className="min-w-0 flex-1">
             {encabezado}
             {resultados}

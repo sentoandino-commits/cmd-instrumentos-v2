@@ -8,19 +8,23 @@ import { Pieza } from "@/lib/types";
 
 /**
  * Barra lateral compacta (buscador + filtros + lista + "+ Nueva pieza")
- * compartida por la ficha de detalle, y los formularios de crear/editar
- * — las 3 páginas que muestran el catálogo compactado a un costado.
+ * compartida por el catálogo, la ficha de detalle, y los formularios
+ * de crear/editar.
  */
 export default function SidebarPiezas({
   lista,
   culturas,
   activaId,
   puedeCrear,
+  mostrarLista = true,
 }: {
   lista: Pieza[];
   culturas: string[];
   activaId?: string;
   puedeCrear: boolean;
+  /** false en el catálogo: el área principal ya muestra las mismas
+   * piezas en tarjetas grandes, repetirlas acá sería redundante. */
+  mostrarLista?: boolean;
 }) {
   return (
     <aside className="w-72 shrink-0 space-y-3">
@@ -40,11 +44,13 @@ export default function SidebarPiezas({
         </Link>
       )}
 
-      <div className="flex flex-col gap-2 pt-2">
-        {lista.map((p) => (
-          <PiezaCard key={p.id} pieza={p} compacta activa={p.id === activaId} />
-        ))}
-      </div>
+      {mostrarLista && (
+        <div className="flex flex-col gap-2 pt-2">
+          {lista.map((p) => (
+            <PiezaCard key={p.id} pieza={p} compacta activa={p.id === activaId} />
+          ))}
+        </div>
+      )}
     </aside>
   );
 }

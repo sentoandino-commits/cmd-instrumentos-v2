@@ -37,7 +37,7 @@ export default async function PapersPage({
           switch Piezas/Papers) está siempre presente aquí — mismo
           layout que el resto de las páginas cuando hay sesión. */}
       <div className="mx-auto flex max-w-6xl gap-6 px-6 py-8">
-        <SidebarPapers lista={(papers as Paper[] | null) ?? []} />
+        <SidebarPapers lista={(papers as Paper[] | null) ?? []} mostrarLista={false} />
 
         <main className="min-w-0 flex-1">
           <h1 className="mb-1 text-2xl font-bold text-ink">Biblioteca de papers</h1>
