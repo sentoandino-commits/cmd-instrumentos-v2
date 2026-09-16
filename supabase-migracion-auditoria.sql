@@ -94,3 +94,10 @@ drop trigger if exists trg_auditoria_piezas on public.piezas;
 create trigger trg_auditoria_piezas
   after insert or update or delete on public.piezas
   for each row execute function public.registrar_auditoria();
+
+-- Si la base viene del prototipo anterior, es posible que ya exista
+-- un trigger de auditoría propio (ej. "trg_audit_piezas" llamando a
+-- "log_audit_change()"), que registraría cada cambio DOS veces (una
+-- vez con cada trigger). Se elimina para dejar un solo trigger activo
+-- — la función vieja se deja sin tocar por si algo más la usa.
+drop trigger if exists trg_audit_piezas on public.piezas;
