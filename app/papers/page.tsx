@@ -1,11 +1,9 @@
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Header from "@/components/Header";
-import SearchBar from "@/components/SearchBar";
-import SeccionSwitch from "@/components/SeccionSwitch";
 import PaperCard from "@/components/papers/PaperCard";
 import NuevoPaperForm from "@/components/papers/NuevoPaperForm";
+import SidebarPapers from "@/components/papers/SidebarPapers";
 import { Paper } from "@/lib/types";
 
 // Biblioteca exclusiva de investigadores — no debe indexarse aunque la
@@ -35,46 +33,41 @@ export default async function PapersPage({
   return (
     <div>
       <Header />
-      <main className="mx-auto max-w-6xl px-6 py-8">
-        <div className="mb-1 flex items-center justify-between gap-3">
-          <h1 className="text-2xl font-bold text-ink">Biblioteca de papers</h1>
-        </div>
-        <p className="mb-6 text-sm text-inkSoft">
-          {papers?.length ?? 0} paper{papers?.length !== 1 ? "s" : ""} · visible solo para investigadores
-        </p>
+      {/* Toda la ruta requiere sesión, así que la barra lateral (con el
+          switch Piezas/Papers) está siempre presente aquí — mismo
+          layout que el resto de las páginas cuando hay sesión. */}
+      <div className="mx-auto flex max-w-6xl gap-6 px-6 py-8">
+        <SidebarPapers lista={(papers as Paper[] | null) ?? []} />
 
-        <div className="mb-4 max-w-xs">
-          <SeccionSwitch activa="papers" />
-        </div>
+        <main className="min-w-0 flex-1">
+          <h1 className="mb-1 text-2xl font-bold text-ink">Biblioteca de papers</h1>
+          <p className="mb-6 text-sm text-inkSoft">
+            {papers?.length ?? 0} paper{papers?.length !== 1 ? "s" : ""} · visible solo para investigadores
+          </p>
 
-        <Suspense fallback={<div className="mb-4 h-10 rounded-lg bg-paperLight" />}>
-          <div className="mb-4">
-            <SearchBar />
+          <div className="mb-6">
+            <NuevoPaperForm />
           </div>
-        </Suspense>
 
-        <div className="mb-6">
-          <NuevoPaperForm />
-        </div>
+          {error && (
+            <div className="mb-4 rounded-lg border border-danger bg-dangerLight p-3 text-sm text-danger">
+              Error al cargar la biblioteca: {error.message}
+            </div>
+          )}
 
-        {error && (
-          <div className="mb-4 rounded-lg border border-danger bg-dangerLight p-3 text-sm text-danger">
-            Error al cargar la biblioteca: {error.message}
+          {papers && papers.length === 0 && (
+            <div className="rounded-xl border border-line bg-paperLight p-10 text-center text-sm text-inkSoft">
+              No se encontraron papers con esa búsqueda.
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {(papers as Paper[] | null)?.map((p) => (
+              <PaperCard key={p.id} paper={p} />
+            ))}
           </div>
-        )}
-
-        {papers && papers.length === 0 && (
-          <div className="rounded-xl border border-line bg-paperLight p-10 text-center text-sm text-inkSoft">
-            No se encontraron papers con esa búsqueda.
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {(papers as Paper[] | null)?.map((p) => (
-            <PaperCard key={p.id} paper={p} />
-          ))}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
