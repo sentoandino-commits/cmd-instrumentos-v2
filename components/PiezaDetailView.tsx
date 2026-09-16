@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   FAMILIAS,
   FAMILIA_COLOR,
@@ -7,6 +8,17 @@ import {
   ClasificacionHS,
 } from "@/lib/types";
 import { FactPill, Dato, CardSection } from "@/components/Dato";
+
+function EditarLink({ piezaId, tab }: { piezaId: string; tab: string }) {
+  return (
+    <Link
+      href={`/piezas/${piezaId}/editar?tab=${tab}`}
+      className="shrink-0 text-xs font-medium text-clay hover:underline"
+    >
+      ✎ editar
+    </Link>
+  );
+}
 
 function organologicoParaVista(pieza: Pieza): [string, string | number][] {
   if (pieza.familia === "aerofono") {
@@ -55,9 +67,11 @@ const ESTADO_INTERPRETACION_LABEL: Record<string, string> = {
 export default function PiezaDetailView({
   pieza,
   hsList,
+  puedeEditar = false,
 }: {
   pieza: Pieza;
   hsList: ClasificacionHS[];
+  puedeEditar?: boolean;
 }) {
   const hs = hsList.find((h) => h.codigo === pieza.codigo_hs);
   const familiaLabel = FAMILIAS.find((f) => f.id === pieza.familia)?.label ?? pieza.familia;
@@ -76,8 +90,18 @@ export default function PiezaDetailView({
 
   return (
     <div>
-      <nav className="mb-4 text-xs text-inkSoft">
-        Fichero › {familiaLabel} › <span className="font-semibold text-ink">{pieza.nombre_generico}</span>
+      <nav className="mb-4 flex items-center justify-between gap-3 text-xs text-inkSoft">
+        <span>
+          Fichero › {familiaLabel} › <span className="font-semibold text-ink">{pieza.nombre_generico}</span>
+        </span>
+        {puedeEditar && (
+          <Link
+            href={`/piezas/${pieza.id}/editar`}
+            className="shrink-0 rounded-lg border border-clay px-3 py-1.5 text-xs font-semibold text-clay hover:bg-clayLight"
+          >
+            ✎ Editar pieza
+          </Link>
+        )}
       </nav>
 
       <div className="mb-5 flex h-80 w-full items-center justify-center rounded-xl border border-line bg-paperLight text-sm text-inkSoft">
@@ -114,7 +138,10 @@ export default function PiezaDetailView({
       )}
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <CardSection title="Identificación y procedencia">
+        <CardSection
+          title="Identificación y procedencia"
+          action={puedeEditar && <EditarLink piezaId={pieza.id} tab="identificacion" />}
+        >
           <Dato label="Contexto" value={pieza.contexto} />
           <Dato label="N° de registro histórico" value={procedencia?.numero_registro_historico} />
           <Dato label="Fecha de hallazgo" value={procedencia?.fecha_hallazgo} />
@@ -132,7 +159,10 @@ export default function PiezaDetailView({
           </CardSection>
         )}
 
-        <CardSection title="Morfología">
+        <CardSection
+          title="Morfología"
+          action={puedeEditar && <EditarLink piezaId={pieza.id} tab="morfologia" />}
+        >
           <Dato label="Integridad" value={INTEGRIDAD_LABELS[pieza.integridad]} />
           {pieza.descripcion_fragmentacion && (
             <Dato label="Descripción de la fragmentación" value={pieza.descripcion_fragmentacion} full />
@@ -157,6 +187,7 @@ export default function PiezaDetailView({
           title={
             `Organológico — ${familiaLabel}` + (badgeInterpretacion ? ` · ${badgeInterpretacion}` : "")
           }
+          action={puedeEditar && <EditarLink piezaId={pieza.id} tab="organologico" />}
         >
           {orgFilas.length === 0 ? (
             <div className="col-span-2 text-sm italic text-inkSoft">Sin datos organológicos.</div>
@@ -173,7 +204,10 @@ export default function PiezaDetailView({
           )}
         </CardSection>
 
-        <CardSection title="Actores vinculados">
+        <CardSection
+          title="Actores vinculados"
+          action={puedeEditar && <EditarLink piezaId={pieza.id} tab="actores" />}
+        >
           {actores.length === 0 ? (
             <div className="col-span-2 text-sm italic text-inkSoft">Sin actores vinculados.</div>
           ) : (
@@ -183,7 +217,11 @@ export default function PiezaDetailView({
           )}
         </CardSection>
 
-        <CardSection title="Bibliografía" span>
+        <CardSection
+          title="Bibliografía"
+          span
+          action={puedeEditar && <EditarLink piezaId={pieza.id} tab="papers" />}
+        >
           {papers.length === 0 ? (
             <div className="col-span-full text-sm italic text-inkSoft">Sin papers vinculados.</div>
           ) : (

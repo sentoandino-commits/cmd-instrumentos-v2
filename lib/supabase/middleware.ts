@@ -26,7 +26,21 @@ export async function updateSession(request: NextRequest) {
   );
 
   // No borrar esta línea: es la que efectivamente renueva la sesión.
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Rutas de creación/edición de piezas: requieren sesión. La
+  // protección real de escritura vive en las políticas RLS
+  // (supabase-migracion-formularios.sql); esto es solo para no
+  // dejar que un visitante sin sesión llegue al formulario.
+  const esRutaProtegida =
+    request.nextUrl.pathname === "/piezas/nueva" ||
+    /^\/piezas\/[^/]+\/editar$/.test(request.nextUrl.pathname);
+
+  if (esRutaProtegida && !user) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
 
   return supabaseResponse;
 }

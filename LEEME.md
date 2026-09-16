@@ -1,14 +1,20 @@
 # Fichero de instrumentos andinos — proyecto Next.js
 
-Esta es la primera etapa de la migración: **catálogo público con búsqueda
-instantánea vía URL + ficha individual con layout adaptativo** (barra
-lateral compacta al ver un detalle). Login, papers/Drive, auditoría y
-exportación quedan para las siguientes etapas, según el plan que revisamos.
+Catálogo público con búsqueda instantánea vía URL + ficha individual con
+layout adaptativo (barra lateral compacta al ver un detalle), login de
+investigadores con Google, y formularios de creación/edición de piezas
+("fichaje") con sus 5 pestañas principales. Papers/Drive real, auditoría,
+relaciones entre piezas, fotos reales y exportación quedan para las
+siguientes etapas.
 
 ## Antes de correrlo
 
-1. Corre `supabase-migracion-busqueda.sql` en el **SQL Editor** de tu
-   proyecto Supabase (el mismo de siempre — no se creó una base nueva).
+1. Corre, en orden, en el **SQL Editor** de tu proyecto Supabase (el
+   mismo de siempre — no se creó una base nueva):
+   - `supabase-migracion-busqueda.sql`
+   - `supabase-migracion-auth.sql`
+   - `supabase-migracion-formularios.sql` (políticas de escritura —
+     necesaria para poder crear/editar piezas)
 2. Copia `.env.local.example` a un archivo nuevo llamado `.env.local`
    (ya viene con tu Project URL y tu clave pública precargadas).
 
@@ -44,10 +50,18 @@ Abre `http://localhost:3000` — te va a llevar directo a `/piezas`.
 - Prueba con el celular / achicando la ventana del navegador — Tailwind
   ya trae la base responsiva, aunque el pulido fino queda para una etapa
   posterior.
+- Con sesión iniciada: botón "+ Nueva pieza" en el catálogo, y "✎ editar"
+  en cada tarjeta de una ficha (abre el formulario ya en esa pestaña).
+  Prueba crear una pieza completa (las 5 pestañas), editarla, cambiarle
+  la familia organológica, y eliminarla (soft delete — desaparece del
+  catálogo pero sigue en la base).
 
 ## Qué falta (a propósito, para las próximas etapas)
 
-- Formularios de creación/edición de fichas
-- Biblioteca de papers con links de Drive protegidos
-- Auditoría, relaciones entre piezas, exportación a PDF/Excel
-- Fotos reales (por ahora la ficha muestra un espacio vacío)
+- Biblioteca de papers como sección propia (`/papers`) con links de Drive
+  protegidos — hoy los papers solo se crean/vinculan desde el formulario
+  de una pieza, y el link de Drive no está gateado por sesión todavía
+- Auditoría (bitácora de cambios), relaciones entre piezas, exportación a
+  PDF/Excel
+- Fotos y audio reales (por ahora la ficha muestra un espacio vacío/
+  placeholder) — falta conectar Supabase Storage

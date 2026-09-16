@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
@@ -15,6 +16,10 @@ export default async function CatalogoPage({
 }) {
   const { q, familia, cultura } = searchParams;
   const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   let query = supabase
     .from("piezas")
@@ -44,7 +49,17 @@ export default async function CatalogoPage({
     <div>
       <Header />
       <main className="mx-auto max-w-6xl px-6 py-8">
-        <h1 className="mb-1 text-2xl font-bold text-ink">Catálogo de instrumentos</h1>
+        <div className="mb-1 flex items-center justify-between gap-3">
+          <h1 className="text-2xl font-bold text-ink">Catálogo de instrumentos</h1>
+          {user && (
+            <Link
+              href="/piezas/nueva"
+              className="shrink-0 rounded-lg bg-clay px-4 py-2 text-sm font-semibold text-white"
+            >
+              + Nueva pieza
+            </Link>
+          )}
+        </div>
         <p className="mb-6 text-sm text-inkSoft">
           {piezas?.length ?? 0} pieza{piezas?.length !== 1 ? "s" : ""} en el fichero
         </p>

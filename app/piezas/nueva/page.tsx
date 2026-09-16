@@ -1,40 +1,33 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
 import FilterPanel from "@/components/FilterPanel";
 import PiezaCard from "@/components/PiezaCard";
-import PiezaDetailView from "@/components/PiezaDetailView";
+import PiezaForm from "@/components/piezas/PiezaForm";
 import { Pieza } from "@/lib/types";
-import { SELECT_PIEZA } from "@/lib/queries";
-import { notFound } from "next/navigation";
 
-export default async function FichaPage({
-  params,
+export default async function NuevaPiezaPage({
   searchParams,
 }: {
-  params: { id: string };
   searchParams: { q?: string; familia?: string; cultura?: string };
 }) {
-  const { id } = params;
   const { q, familia, cultura } = searchParams;
   const supabase = await createClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
-  const { data: pieza, error } = await supabase
-    .from("piezas")
-    .select(SELECT_PIEZA)
-    .eq("id", id)
-    .single();
+  const [{ data: hsList }, { data: sitios }, { data: actores }, { data: papers }] = await Promise.all([
+    supabase.from("clasificacion_hs").select("*"),
+    supabase.from("sitios").select("id, nombre").order("nombre"),
+    supabase.from("actores").select("id, nombre, tipo").order("nombre"),
+    supabase.from("papers").select("id, titulo, anio").order("titulo"),
+  ]);
 
-  if (error || !pieza) notFound();
-
-  const { data: hsList } = await supabase.from("clasificacion_hs").select("*");
-
-  // Lista compacta para la barra lateral, con los mismos filtros que el catálogo
   let listaQuery = supabase
     .from("piezas")
     .select("id, familia, nombre_generico, numero_inventario_museo")
@@ -50,9 +43,7 @@ export default async function FichaPage({
     .select("cultura_etnia")
     .not("cultura_etnia", "is", null)
     .is("deleted_at", null);
-  const culturas = Array.from(
-    new Set((culturasRaw ?? []).map((r) => r.cultura_etnia as string))
-  ).sort();
+  const culturas = Array.from(new Set((culturasRaw ?? []).map((r) => r.cultura_etnia as string))).sort();
 
   return (
     <div>
@@ -65,16 +56,19 @@ export default async function FichaPage({
           </Suspense>
           <div className="flex flex-col gap-2 pt-2">
             {(lista as Pieza[] | null)?.map((p) => (
-              <PiezaCard key={p.id} pieza={p} compacta activa={p.id === id} />
+              <PiezaCard key={p.id} pieza={p} compacta />
             ))}
           </div>
         </aside>
 
         <main className="min-w-0 flex-1">
-          <PiezaDetailView
-            pieza={pieza as unknown as Pieza}
+          <h1 className="mb-4 text-xl font-bold text-ink">Nueva pieza</h1>
+          <PiezaForm
+            modo="crear"
             hsList={hsList ?? []}
-            puedeEditar={Boolean(user)}
+            sitios={sitios ?? []}
+            actoresExistentes={actores ?? []}
+            papersExistentes={papers ?? []}
           />
         </main>
       </div>

@@ -28,10 +28,12 @@ export function CardSection({
   title,
   children,
   span = false,
+  action,
 }: {
   title: string;
   children: React.ReactNode;
   span?: boolean;
+  action?: React.ReactNode;
 }) {
   return (
     <div
@@ -39,8 +41,11 @@ export function CardSection({
         span ? "col-span-full" : ""
       }`}
     >
-      <div className="mb-3.5 text-xs font-semibold uppercase tracking-wide text-clayDark">
-        {title}
+      <div className="mb-3.5 flex items-center justify-between gap-2">
+        <div className="text-xs font-semibold uppercase tracking-wide text-clayDark">
+          {title}
+        </div>
+        {action}
       </div>
       <div className="grid grid-cols-2 gap-x-4">{children}</div>
     </div>
