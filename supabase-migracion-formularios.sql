@@ -25,6 +25,11 @@
 -- ---- piezas (solo INSERT/UPDATE, sin DELETE a propósito) ----
 alter table public.piezas enable row level security;
 
+-- El GRANT es un permiso de Postgres previo y distinto a RLS: sin esto,
+-- el rol pierde acceso de escritura aunque la política de abajo exista
+-- (mismo tipo de problema que tuvimos con el SELECT de "piezas").
+grant insert, update on public.piezas to authenticated;
+
 drop policy if exists "auth_insert_piezas" on public.piezas;
 create policy "auth_insert_piezas" on public.piezas
   for insert to authenticated with check (true);
@@ -45,6 +50,8 @@ declare
 begin
   foreach tabla in array tablas loop
     execute format('alter table public.%I enable row level security;', tabla);
+    execute format('grant select, insert, update, delete on public.%I to authenticated;', tabla);
+    execute format('grant select on public.%I to anon;', tabla);
 
     execute format('drop policy if exists %I on public.%I;',
       'publico_select_' || tabla, tabla);
