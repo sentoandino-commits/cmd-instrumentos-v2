@@ -9,17 +9,23 @@
 -- guarda la pieza. Los investigadores logueados solo pueden LEER.
 -- =========================================================
 
+-- Si la tabla ya existía (del prototipo anterior, con otra
+-- estructura), "create table if not exists" no la habría tocado y
+-- las columnas de abajo no existirían. Por eso se agrega cada
+-- columna por separado con ADD COLUMN IF NOT EXISTS: funciona igual
+-- si la tabla es nueva o si ya existía con columnas de más.
 create table if not exists public.audit_log (
-  id uuid primary key default gen_random_uuid(),
-  table_name text not null,
-  record_id uuid not null,
-  accion text not null, -- 'INSERT' | 'UPDATE' | 'DELETE'
-  old_data jsonb,
-  new_data jsonb,
-  changed_by uuid,
-  changed_by_email text,
-  changed_at timestamptz not null default now()
+  id uuid primary key default gen_random_uuid()
 );
+
+alter table public.audit_log add column if not exists table_name text;
+alter table public.audit_log add column if not exists record_id uuid;
+alter table public.audit_log add column if not exists accion text; -- 'INSERT' | 'UPDATE' | 'DELETE'
+alter table public.audit_log add column if not exists old_data jsonb;
+alter table public.audit_log add column if not exists new_data jsonb;
+alter table public.audit_log add column if not exists changed_by uuid;
+alter table public.audit_log add column if not exists changed_by_email text;
+alter table public.audit_log add column if not exists changed_at timestamptz not null default now();
 
 create index if not exists idx_audit_log_tabla_registro
   on public.audit_log(table_name, record_id, changed_at desc);
