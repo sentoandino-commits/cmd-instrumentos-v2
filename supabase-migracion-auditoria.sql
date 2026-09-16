@@ -27,6 +27,28 @@ alter table public.audit_log add column if not exists changed_by uuid;
 alter table public.audit_log add column if not exists changed_by_email text;
 alter table public.audit_log add column if not exists changed_at timestamptz not null default now();
 
+-- La tabla preexistente tenía columnas propias del prototipo anterior
+-- que esta app no llena (ej. "action", en inglés, distinta de nuestra
+-- "accion"). Si alguna de ellas quedó NOT NULL sin default, el insert
+-- del trigger fallaría — así que se les quita esa restricción en vez
+-- de adivinar y llenar columnas que ya no se usan.
+do $$
+declare
+  columna text;
+begin
+  for columna in
+    select column_name from information_schema.columns
+    where table_schema = 'public' and table_name = 'audit_log'
+      and column_name not in (
+        'id', 'table_name', 'record_id', 'accion', 'old_data',
+        'new_data', 'changed_by', 'changed_by_email', 'changed_at'
+      )
+      and is_nullable = 'NO'
+  loop
+    execute format('alter table public.audit_log alter column %I drop not null', columna);
+  end loop;
+end $$;
+
 create index if not exists idx_audit_log_tabla_registro
   on public.audit_log(table_name, record_id, changed_at desc);
 
