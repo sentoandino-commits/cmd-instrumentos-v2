@@ -8,3 +8,11 @@ body {
   background: #f4f6f8;
   color: #1a2733;
 }
+
+/* Márgenes más prolijos que el default del navegador al imprimir o
+   guardar como PDF (ver components/piezas/BotonDescargarPDF.tsx). */
+@media print {
+  @page {
+    margin: 1.5cm;
+  }
+}

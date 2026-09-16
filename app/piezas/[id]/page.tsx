@@ -5,6 +5,25 @@ import SidebarPiezas from "@/components/piezas/SidebarPiezas";
 import { Pieza } from "@/lib/types";
 import { SELECT_PIEZA, fetchRelacionesPieza, fetchHistorialPieza } from "@/lib/queries";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+
+// El <title> de la pestaña también es el nombre de archivo por
+// defecto al usar "Guardar como PDF" — vale la pena que sea el
+// nombre de la pieza, no el genérico del sitio.
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  const supabase = await createClient();
+  const { data: pieza } = await supabase
+    .from("piezas")
+    .select("nombre_generico")
+    .eq("id", params.id)
+    .single();
+
+  return { title: pieza?.nombre_generico ?? "Ficha no encontrada" };
+}
 
 export default async function FichaPage({
   params,

@@ -40,9 +40,15 @@ export async function updateSession(request: NextRequest) {
   // exclusiva de investigadores — toda la ruta se protege, no solo
   // el botón de crear, para que tampoco se pueda llegar por URL
   // directa sin sesión.
+  //
+  // /piezas/exportar y /piezas/[id]/exportar: el Excel es exclusivo
+  // de investigadores (el PDF de la ficha, en cambio, es público —
+  // no se protege esa parte).
   const esRutaProtegida =
     request.nextUrl.pathname === "/piezas/nueva" ||
     /^\/piezas\/[^/]+\/editar$/.test(request.nextUrl.pathname) ||
+    request.nextUrl.pathname === "/piezas/exportar" ||
+    /^\/piezas\/[^/]+\/exportar$/.test(request.nextUrl.pathname) ||
     request.nextUrl.pathname === "/papers" ||
     request.nextUrl.pathname.startsWith("/papers/");
 

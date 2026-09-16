@@ -8,7 +8,7 @@ export default async function Header() {
   } = await supabase.auth.getUser();
 
   return (
-    <header className="border-b border-line bg-paperLight px-6 py-4">
+    <header className="border-b border-line bg-paperLight px-6 py-4 print:hidden">
       <div className="mx-auto flex max-w-6xl items-center justify-between">
         <Link href="/piezas">
           <div className="text-lg font-bold text-ink">

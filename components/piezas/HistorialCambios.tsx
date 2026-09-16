@@ -22,7 +22,7 @@ export default function HistorialCambios({ entradas }: { entradas: EntradaAuditL
   const [abierto, setAbierto] = useState(false);
 
   return (
-    <div className="mt-8 border-t border-line pt-3">
+    <div>
       <button
         type="button"
         onClick={() => setAbierto((v) => !v)}

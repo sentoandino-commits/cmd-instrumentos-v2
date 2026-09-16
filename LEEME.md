@@ -3,9 +3,10 @@
 Catálogo público con búsqueda instantánea vía URL + ficha individual con
 layout adaptativo, login de investigadores con Google, formularios de
 creación/edición de piezas ("fichaje") con sus 6 pestañas (incluye
-relaciones entre piezas), biblioteca de papers con links de Drive, e
-historial de cambios discreto. Fotos/audio reales y exportación quedan
-para las siguientes etapas.
+relaciones entre piezas), biblioteca de papers con links de Drive,
+historial de cambios discreto, y exportación (PDF de cualquier ficha,
+Excel por ficha y del catálogo completo). Fotos/audio reales quedan
+para una etapa futura.
 
 ## Antes de correrlo
 
@@ -76,9 +77,22 @@ Abre `http://localhost:3000` — te va a llevar directo a `/piezas`.
   `supabase-migracion-auditoria.sql`, las piezas ya existentes no van a
   tener historial todavía — el trigger solo registra cambios a partir
   de ese momento, así que edítalas de nuevo para verlo aparecer.
+- En cualquier ficha (con o sin sesión), botón "⬇ Descargar PDF" arriba
+  a la derecha — abre el diálogo de impresión del navegador ("Guardar
+  como PDF"); al vista previa no debería mostrar el menú del sitio, los
+  botones de editar, ni las secciones/campos vacíos. Al guardar, deja
+  desmarcada la opción "Encabezados y pies de página" del diálogo de
+  impresión de tu navegador si aparece marcada — es una opción del
+  navegador, no algo que la app pueda desactivar.
+- Con sesión iniciada: link discreto "⬇ Descargar Excel" al fondo de
+  cada ficha (junto al historial) — una hoja con todos los datos de esa
+  pieza en formato vertical (fácil de leer). Y en la barra lateral, "⬇
+  Exportar catálogo completo (Excel)" — un libro con 8 hojas (Piezas,
+  Sitios, Actores, Actores por pieza, Papers, Papers por pieza, Medidas,
+  Relaciones), pensado como respaldo completo del catálogo, no solo lo
+  que esté filtrado en ese momento.
 
 ## Qué falta (a propósito, para las próximas etapas)
 
-- Exportación a PDF/Excel
 - Fotos y audio reales (por ahora la ficha muestra un espacio vacío/
   placeholder) — falta conectar Supabase Storage

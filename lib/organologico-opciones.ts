@@ -4,7 +4,7 @@
 // da. Selectores que describen una cualidad del sonido (tañido) no
 // llevan ejemplo, a propósito.
 
-import { TIPO_RELACION_LABELS, TipoRelacion } from "./types";
+import { TIPO_RELACION_LABELS, TipoRelacion, Pieza, unoONulo } from "./types";
 
 export interface Opcion {
   value: string;
@@ -131,4 +131,48 @@ export const TIPO_RELACION_OPCIONES: Opcion[] = (
 
 export function labelConEjemplo(opcion: Opcion): string {
   return opcion.ejemplo ? `${opcion.label} (Ej: ${opcion.ejemplo})` : opcion.label;
+}
+
+/**
+ * Pares [etiqueta, valor] de los campos organológicos según la
+ * familia de la pieza — compartido entre la vista de la ficha
+ * (PiezaDetailView) y las exportaciones (Excel por ficha).
+ */
+export function organologicoParaVista(pieza: Pieza): [string, string | number][] {
+  if (pieza.familia === "aerofono") {
+    const o = unoONulo(pieza.aerofonos);
+    if (!o) return [];
+    return [
+      ["Mecanismo de vibración", o.mecanismo_vibracion ?? "—"],
+      ["Diapasón de referencia", o.diapason_referencia ?? "—"],
+      ["N° de tubos", o.numero_tubos ?? "—"],
+      ["Notación musical", o.notacion_musical ?? "—"],
+      ["Tañido — potencia", o.tañido_potencia ?? "—"],
+      ["Tañido — calidad", o.tañido_calidad ?? "—"],
+    ];
+  }
+  if (pieza.familia === "cordofono") {
+    const o = unoONulo(pieza.cordofonos);
+    if (!o) return [];
+    const cuerdas = o.orden_cuerdas?.map((c) => `${c.posicion}: ${c.nota}`).join(" · ") ?? "—";
+    return [
+      ["Posición de las cuerdas", o.posicion_cuerdas ?? "—"],
+      ["Orden de cuerdas", cuerdas],
+    ];
+  }
+  if (pieza.familia === "idiofono") {
+    const o = unoONulo(pieza.idiofonos);
+    return o ? [["Mecanismo", o.mecanismo ?? "—"]] : [];
+  }
+  if (pieza.familia === "membranofono") {
+    const o = unoONulo(pieza.membranofonos);
+    if (!o) return [];
+    return [
+      ["Tipo de fondo", o.tipo_fondo ?? "—"],
+      ["Mecanismo", o.mecanismo ?? "—"],
+      ["Material de la membrana", o.material_membrana ?? "—"],
+      ["Fijación de la membrana", o.fijacion_membrana ?? "—"],
+    ];
+  }
+  return [];
 }

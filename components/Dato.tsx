@@ -16,10 +16,13 @@ export function Dato({
   value?: string | number | null;
   full?: boolean;
 }) {
+  const tieneValor = Boolean(value) || value === 0;
   return (
-    <div className={`mb-2.5 ${full ? "col-span-2" : ""}`}>
+    // Sin valor: en pantalla se ve "—" (útil para saber qué falta
+    // completar); en el PDF desaparece del todo, no aporta nada impreso.
+    <div className={`mb-2.5 ${full ? "col-span-2" : ""} ${tieneValor ? "" : "print:hidden"}`}>
       <div className="text-[11px] tracking-wide text-inkSoft">{label}</div>
-      <div className="text-sm text-ink">{value || value === 0 ? value : "—"}</div>
+      <div className="text-sm text-ink">{tieneValor ? value : "—"}</div>
     </div>
   );
 }

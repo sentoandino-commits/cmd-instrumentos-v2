@@ -27,7 +27,7 @@ export default function SidebarPiezas({
   mostrarLista?: boolean;
 }) {
   return (
-    <aside className="w-72 shrink-0 space-y-3">
+    <aside className="w-72 shrink-0 space-y-3 print:hidden">
       {puedeCrear && <SeccionSwitch activa="piezas" />}
 
       <Suspense fallback={<div className="h-10 rounded-lg bg-paperLight" />}>
@@ -42,6 +42,15 @@ export default function SidebarPiezas({
         >
           + Nueva pieza
         </Link>
+      )}
+
+      {puedeCrear && (
+        <a
+          href="/piezas/exportar"
+          className="block text-center text-xs text-inkSoft underline decoration-dotted hover:text-ink"
+        >
+          ⬇ Exportar catálogo completo (Excel)
+        </a>
       )}
 
       {mostrarLista && (
