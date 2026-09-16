@@ -10,6 +10,8 @@ import {
   TIPO_RELACION_LABELS,
 } from "@/lib/types";
 import { FactPill, Dato, CardSection } from "@/components/Dato";
+import HistorialCambios from "@/components/piezas/HistorialCambios";
+import { EntradaAuditLog } from "@/lib/auditoria";
 
 function EditarLink({ piezaId, tab }: { piezaId: string; tab: string }) {
   return (
@@ -70,11 +72,13 @@ export default function PiezaDetailView({
   pieza,
   hsList,
   relaciones = [],
+  historial = [],
   puedeEditar = false,
 }: {
   pieza: Pieza;
   hsList: ClasificacionHS[];
   relaciones?: RelacionPieza[];
+  historial?: EntradaAuditLog[];
   puedeEditar?: boolean;
 }) {
   const hs = hsList.find((h) => h.codigo === pieza.codigo_hs);
@@ -298,6 +302,8 @@ export default function PiezaDetailView({
           )}
         </CardSection>
       </div>
+
+      {puedeEditar && historial.length > 0 && <HistorialCambios entradas={historial} />}
     </div>
   );
 }

@@ -1,11 +1,11 @@
 # Fichero de instrumentos andinos — proyecto Next.js
 
 Catálogo público con búsqueda instantánea vía URL + ficha individual con
-layout adaptativo (barra lateral compacta al ver un detalle), login de
-investigadores con Google, y formularios de creación/edición de piezas
-("fichaje") con sus 5 pestañas principales. Papers/Drive real, auditoría,
-relaciones entre piezas, fotos reales y exportación quedan para las
-siguientes etapas.
+layout adaptativo, login de investigadores con Google, formularios de
+creación/edición de piezas ("fichaje") con sus 6 pestañas (incluye
+relaciones entre piezas), biblioteca de papers con links de Drive, e
+historial de cambios discreto. Fotos/audio reales y exportación quedan
+para las siguientes etapas.
 
 ## Antes de correrlo
 
@@ -17,6 +17,8 @@ siguientes etapas.
      necesaria para poder crear/editar piezas)
    - `supabase-migracion-relaciones.sql` (tabla + políticas para
      "Piezas relacionadas" — necesaria para la pestaña Relaciones)
+   - `supabase-migracion-auditoria.sql` (tabla `audit_log` + trigger —
+     necesaria para el historial de cambios)
 2. Copia `.env.local.example` a un archivo nuevo llamado `.env.local`
    (ya viene con tu Project URL y tu clave pública precargadas).
 
@@ -66,9 +68,17 @@ Abre `http://localhost:3000` — te va a llevar directo a `/piezas`.
   compartirlo aparte con las cuentas del equipo — la protección de la
   app es solo para no mostrar el link, no reemplaza los permisos de
   Drive.
+- Con sesión iniciada, edita una pieza dos o tres veces y al fondo de su
+  ficha aparece un link chico y gris "Historial de cambios (N)" — clic
+  para desplegar fecha, correo de quien editó, y qué cambió, en
+  lenguaje simple. Sin sesión no aparece ni el link (a propósito, es
+  discreto y exclusivo de investigadores). Si acabas de correr
+  `supabase-migracion-auditoria.sql`, las piezas ya existentes no van a
+  tener historial todavía — el trigger solo registra cambios a partir
+  de ese momento, así que edítalas de nuevo para verlo aparecer.
 
 ## Qué falta (a propósito, para las próximas etapas)
 
-- Auditoría (bitácora de cambios), exportación a PDF/Excel
+- Exportación a PDF/Excel
 - Fotos y audio reales (por ahora la ficha muestra un espacio vacío/
   placeholder) — falta conectar Supabase Storage

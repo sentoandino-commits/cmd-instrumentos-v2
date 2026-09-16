@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { RelacionPieza, TipoRelacion } from "./types";
+import type { EntradaAuditLog } from "./auditoria";
 
 // Select reutilizado para traer una pieza completa con todas sus
 // relaciones anidadas — usado por la ficha de solo lectura y por el
@@ -39,4 +40,23 @@ export async function fetchRelacionesPieza(
     if (!otraPieza) return [];
     return [{ id: fila.id, tipo_relacion: fila.tipo_relacion, notas: fila.notas, otraPieza }];
   });
+}
+
+/**
+ * Historial de cambios de una pieza (tabla audit_log). Solo tiene
+ * sentido llamarla con sesión — la policy de audit_log no da lectura
+ * a anon, así que sin sesión esto devuelve vacío igual.
+ */
+export async function fetchHistorialPieza(
+  supabase: SupabaseClient,
+  piezaId: string
+): Promise<EntradaAuditLog[]> {
+  const { data } = await supabase
+    .from("audit_log")
+    .select("id, accion, old_data, new_data, changed_by_email, changed_at")
+    .eq("table_name", "piezas")
+    .eq("record_id", piezaId)
+    .order("changed_at", { ascending: false });
+
+  return (data ?? []) as EntradaAuditLog[];
 }
