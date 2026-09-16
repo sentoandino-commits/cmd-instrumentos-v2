@@ -15,6 +15,8 @@ siguientes etapas.
    - `supabase-migracion-auth.sql`
    - `supabase-migracion-formularios.sql` (políticas de escritura —
      necesaria para poder crear/editar piezas)
+   - `supabase-migracion-relaciones.sql` (tabla + políticas para
+     "Piezas relacionadas" — necesaria para la pestaña Relaciones)
 2. Copia `.env.local.example` a un archivo nuevo llamado `.env.local`
    (ya viene con tu Project URL y tu clave pública precargadas).
 
@@ -61,7 +63,6 @@ Abre `http://localhost:3000` — te va a llevar directo a `/piezas`.
 - Biblioteca de papers como sección propia (`/papers`) con links de Drive
   protegidos — hoy los papers solo se crean/vinculan desde el formulario
   de una pieza, y el link de Drive no está gateado por sesión todavía
-- Auditoría (bitácora de cambios), relaciones entre piezas, exportación a
-  PDF/Excel
+- Auditoría (bitácora de cambios), exportación a PDF/Excel
 - Fotos y audio reales (por ahora la ficha muestra un espacio vacío/
   placeholder) — falta conectar Supabase Storage

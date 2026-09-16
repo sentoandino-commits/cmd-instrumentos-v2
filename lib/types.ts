@@ -141,6 +141,29 @@ export interface ClasificacionHS {
   parent_codigo: string | null;
 }
 
+export type TipoRelacion = "mismo_hallazgo" | "duplicado" | "parte_de" | "relacionada";
+
+export const TIPO_RELACION_LABELS: Record<TipoRelacion, string> = {
+  mismo_hallazgo: "Mismo hallazgo / lote",
+  duplicado: "Posible duplicado",
+  parte_de: "Fragmento / parte de",
+  relacionada: "Relacionada (otro motivo)",
+};
+
+// La relación se guarda una sola vez (pieza_id_a/pieza_id_b) pero se
+// consulta desde cualquiera de las dos piezas; "otraPieza" ya viene
+// normalizada por lib/queries.ts sin importar de qué lado quedó guardada.
+export interface RelacionPieza {
+  id: string;
+  tipo_relacion: TipoRelacion;
+  notas: string | null;
+  otraPieza: {
+    id: string;
+    nombre_generico: string;
+    numero_inventario_museo: string | null;
+  };
+}
+
 // PostgREST puede devolver una relación 1:1 como objeto u array de un
 // elemento según la versión; esta función normaliza ambos casos.
 export function unoONulo<T>(valor: T[] | T | null | undefined): T | null {

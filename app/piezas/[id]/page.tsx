@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import PiezaDetailView from "@/components/PiezaDetailView";
 import SidebarPiezas from "@/components/piezas/SidebarPiezas";
 import { Pieza } from "@/lib/types";
-import { SELECT_PIEZA } from "@/lib/queries";
+import { SELECT_PIEZA, fetchRelacionesPieza } from "@/lib/queries";
 import { notFound } from "next/navigation";
 
 export default async function FichaPage({
@@ -30,6 +30,7 @@ export default async function FichaPage({
   if (error || !pieza) notFound();
 
   const { data: hsList } = await supabase.from("clasificacion_hs").select("*");
+  const relaciones = await fetchRelacionesPieza(supabase, id);
 
   // Lista compacta para la barra lateral, con los mismos filtros que el catálogo
   let listaQuery = supabase
@@ -66,6 +67,7 @@ export default async function FichaPage({
           <PiezaDetailView
             pieza={pieza as unknown as Pieza}
             hsList={hsList ?? []}
+            relaciones={relaciones}
             puedeEditar={Boolean(user)}
           />
         </main>

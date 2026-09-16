@@ -218,6 +218,40 @@ async function sincronizarPapers(
   return null;
 }
 
+/**
+ * Borra todas las relaciones donde esta pieza participa (de cualquiera
+ * de los dos lados) y reinserta las actuales con esta pieza siempre
+ * como pieza_id_a. Para los 4 tipos que maneja el formulario la
+ * relación es simétrica, así que reescribir el sentido no cambia su
+ * significado — ver supabase-migracion-relaciones.sql.
+ */
+async function sincronizarRelaciones(
+  supabase: SupabaseClient,
+  piezaId: string,
+  formData: FormData
+): Promise<string | null> {
+  const filas = parseIndexedArray(formData, "relaciones").filter(
+    (f) => f.pieza_id && f.tipo_relacion
+  );
+
+  const { error: errorDelete } = await supabase
+    .from("relaciones_piezas")
+    .delete()
+    .or(`pieza_id_a.eq.${piezaId},pieza_id_b.eq.${piezaId}`);
+  if (errorDelete) return `No se pudieron actualizar las relaciones: ${errorDelete.message}`;
+  if (filas.length === 0) return null;
+
+  const payload = filas.map((f) => ({
+    pieza_id_a: piezaId,
+    pieza_id_b: f.pieza_id,
+    tipo_relacion: f.tipo_relacion,
+    notas: f.notas || null,
+  }));
+  const { error } = await supabase.from("relaciones_piezas").insert(payload);
+  if (error) return `No se pudieron guardar las relaciones: ${error.message}`;
+  return null;
+}
+
 async function guardarPieza(id: string | null, formData: FormData): Promise<EstadoPiezaForm> {
   const supabase = await createClient();
   const user = await requireUser(supabase);
@@ -291,6 +325,9 @@ async function guardarPieza(id: string | null, formData: FormData): Promise<Esta
 
   const errorPapers = await sincronizarPapers(supabase, piezaId, formData);
   if (errorPapers) return { error: errorPapers };
+
+  const errorRelaciones = await sincronizarRelaciones(supabase, piezaId, formData);
+  if (errorRelaciones) return { error: errorRelaciones };
 
   redirect(`/piezas/${piezaId}`);
 }

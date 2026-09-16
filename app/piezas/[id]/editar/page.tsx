@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { SELECT_PIEZA } from "@/lib/queries";
+import { SELECT_PIEZA, fetchRelacionesPieza } from "@/lib/queries";
 import Header from "@/components/Header";
 import PiezaForm from "@/components/piezas/PiezaForm";
 import SidebarPiezas from "@/components/piezas/SidebarPiezas";
@@ -29,11 +29,25 @@ export default async function EditarPiezaPage({
     .single();
   if (error || !pieza) notFound();
 
-  const [{ data: hsList }, { data: sitios }, { data: actores }, { data: papers }] = await Promise.all([
+  const [
+    { data: hsList },
+    { data: sitios },
+    { data: actores },
+    { data: papers },
+    { data: todasLasPiezasRaw },
+    relaciones,
+  ] = await Promise.all([
     supabase.from("clasificacion_hs").select("*"),
     supabase.from("sitios").select("id, nombre").order("nombre"),
     supabase.from("actores").select("id, nombre, tipo").order("nombre"),
     supabase.from("papers").select("id, titulo, anio").order("titulo"),
+    supabase
+      .from("piezas")
+      .select("id, nombre_generico, numero_inventario_museo")
+      .is("deleted_at", null)
+      .neq("id", id)
+      .order("nombre_generico"),
+    fetchRelacionesPieza(supabase, id),
   ]);
 
   let listaQuery = supabase
@@ -69,6 +83,8 @@ export default async function EditarPiezaPage({
             sitios={sitios ?? []}
             actoresExistentes={actores ?? []}
             papersExistentes={papers ?? []}
+            todasLasPiezas={todasLasPiezasRaw ?? []}
+            relacionesIniciales={relaciones}
             initialTab={tab}
           />
         </main>

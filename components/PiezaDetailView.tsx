@@ -6,6 +6,8 @@ import {
   Pieza,
   unoONulo,
   ClasificacionHS,
+  RelacionPieza,
+  TIPO_RELACION_LABELS,
 } from "@/lib/types";
 import { FactPill, Dato, CardSection } from "@/components/Dato";
 
@@ -67,10 +69,12 @@ const ESTADO_INTERPRETACION_LABEL: Record<string, string> = {
 export default function PiezaDetailView({
   pieza,
   hsList,
+  relaciones = [],
   puedeEditar = false,
 }: {
   pieza: Pieza;
   hsList: ClasificacionHS[];
+  relaciones?: RelacionPieza[];
   puedeEditar?: boolean;
 }) {
   const hs = hsList.find((h) => h.codigo === pieza.codigo_hs);
@@ -214,6 +218,28 @@ export default function PiezaDetailView({
             actores.map((a, i) => (
               <Dato key={i} label={a.rol} value={a.actores?.nombre} />
             ))
+          )}
+        </CardSection>
+
+        <CardSection
+          title="Piezas relacionadas"
+          action={puedeEditar && <EditarLink piezaId={pieza.id} tab="relaciones" />}
+        >
+          {relaciones.length === 0 ? (
+            <div className="col-span-2 text-sm italic text-inkSoft">Sin piezas relacionadas.</div>
+          ) : (
+            <div className="col-span-2 flex flex-col gap-2">
+              {relaciones.map((r) => (
+                <Link
+                  key={r.id}
+                  href={`/piezas/${r.otraPieza.id}`}
+                  className="flex items-center justify-between gap-3 border-b border-line pb-2 text-sm last:border-0"
+                >
+                  <span className="text-ink">{r.otraPieza.nombre_generico}</span>
+                  <span className="shrink-0 text-xs text-inkSoft">{TIPO_RELACION_LABELS[r.tipo_relacion]}</span>
+                </Link>
+              ))}
+            </div>
           )}
         </CardSection>
 

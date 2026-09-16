@@ -18,12 +18,18 @@ export default async function NuevaPiezaPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: hsList }, { data: sitios }, { data: actores }, { data: papers }] = await Promise.all([
-    supabase.from("clasificacion_hs").select("*"),
-    supabase.from("sitios").select("id, nombre").order("nombre"),
-    supabase.from("actores").select("id, nombre, tipo").order("nombre"),
-    supabase.from("papers").select("id, titulo, anio").order("titulo"),
-  ]);
+  const [{ data: hsList }, { data: sitios }, { data: actores }, { data: papers }, { data: todasLasPiezas }] =
+    await Promise.all([
+      supabase.from("clasificacion_hs").select("*"),
+      supabase.from("sitios").select("id, nombre").order("nombre"),
+      supabase.from("actores").select("id, nombre, tipo").order("nombre"),
+      supabase.from("papers").select("id, titulo, anio").order("titulo"),
+      supabase
+        .from("piezas")
+        .select("id, nombre_generico, numero_inventario_museo")
+        .is("deleted_at", null)
+        .order("nombre_generico"),
+    ]);
 
   let listaQuery = supabase
     .from("piezas")
@@ -56,6 +62,7 @@ export default async function NuevaPiezaPage({
             sitios={sitios ?? []}
             actoresExistentes={actores ?? []}
             papersExistentes={papers ?? []}
+            todasLasPiezas={todasLasPiezas ?? []}
           />
         </main>
       </div>

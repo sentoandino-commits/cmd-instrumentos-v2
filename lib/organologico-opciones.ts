@@ -4,6 +4,8 @@
 // da. Selectores que describen una cualidad del sonido (tañido) no
 // llevan ejemplo, a propósito.
 
+import { TIPO_RELACION_LABELS, TipoRelacion } from "./types";
+
 export interface Opcion {
   value: string;
   label: string;
@@ -121,6 +123,11 @@ export const ORIGEN_PAPER_OPCIONES: Opcion[] = [
   { value: "publicado", label: "Publicado" },
   { value: "acceso_abierto", label: "Acceso abierto" },
 ];
+
+// ---- Relaciones ----
+export const TIPO_RELACION_OPCIONES: Opcion[] = (
+  Object.keys(TIPO_RELACION_LABELS) as TipoRelacion[]
+).map((v) => ({ value: v, label: TIPO_RELACION_LABELS[v] }));
 
 export function labelConEjemplo(opcion: Opcion): string {
   return opcion.ejemplo ? `${opcion.label} (Ej: ${opcion.ejemplo})` : opcion.label;

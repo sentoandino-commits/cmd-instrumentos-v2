@@ -4,15 +4,22 @@ import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import Link from "next/link";
 import { crearPieza, actualizarPieza } from "@/lib/actions/piezas";
-import { ClasificacionHS, Pieza, Familia } from "@/lib/types";
+import { ClasificacionHS, Pieza, Familia, RelacionPieza } from "@/lib/types";
 import IdentificacionTab from "./IdentificacionTab";
 import MorfologiaTab from "./MorfologiaTab";
 import OrganologicoTab from "./OrganologicoTab";
 import ActoresTab from "./ActoresTab";
 import PapersTab from "./PapersTab";
+import RelacionesTab from "./RelacionesTab";
 import EliminarPiezaButton from "./EliminarPiezaButton";
 
-export type TabId = "identificacion" | "morfologia" | "organologico" | "actores" | "papers";
+export type TabId =
+  | "identificacion"
+  | "morfologia"
+  | "organologico"
+  | "actores"
+  | "papers"
+  | "relaciones";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "identificacion", label: "Identificación" },
@@ -20,6 +27,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "organologico", label: "Organológico" },
   { id: "actores", label: "Actores" },
   { id: "papers", label: "Papers" },
+  { id: "relaciones", label: "Relaciones" },
 ];
 
 function esTabId(valor: string | undefined): valor is TabId {
@@ -47,6 +55,8 @@ export default function PiezaForm({
   sitios,
   actoresExistentes,
   papersExistentes,
+  todasLasPiezas,
+  relacionesIniciales,
   initialTab,
 }: {
   modo: "crear" | "editar";
@@ -56,6 +66,8 @@ export default function PiezaForm({
   sitios: { id: string; nombre: string }[];
   actoresExistentes: { id: string; nombre: string; tipo: string }[];
   papersExistentes: { id: string; titulo: string; anio: number | null }[];
+  todasLasPiezas: { id: string; nombre_generico: string; numero_inventario_museo: string | null }[];
+  relacionesIniciales?: RelacionPieza[];
   initialTab?: string;
 }) {
   const [tab, setTab] = useState<TabId>(esTabId(initialTab) ? initialTab : "identificacion");
@@ -119,6 +131,9 @@ export default function PiezaForm({
         </div>
         <div hidden={tab !== "papers"}>
           <PapersTab papersExistentes={papersExistentes} vinculosIniciales={pieza?.pieza_papers ?? []} />
+        </div>
+        <div hidden={tab !== "relaciones"}>
+          <RelacionesTab todasLasPiezas={todasLasPiezas} relacionesIniciales={relacionesIniciales ?? []} />
         </div>
       </div>
 
