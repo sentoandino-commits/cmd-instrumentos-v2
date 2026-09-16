@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { RelacionPieza, TipoRelacion } from "./types";
-import type { EntradaAuditLog } from "./auditoria";
+import { deduplicarEntradas, type EntradaAuditLog } from "./auditoria";
 
 // Select reutilizado para traer una pieza completa con todas sus
 // relaciones anidadas — usado por la ficha de solo lectura y por el
@@ -58,5 +58,5 @@ export async function fetchHistorialPieza(
     .eq("record_id", piezaId)
     .order("changed_at", { ascending: false });
 
-  return (data ?? []) as EntradaAuditLog[];
+  return deduplicarEntradas((data ?? []) as EntradaAuditLog[]);
 }

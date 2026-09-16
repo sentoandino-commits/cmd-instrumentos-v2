@@ -61,3 +61,31 @@ export function resumirCambios(entrada: EntradaAuditLog): string {
   if (cambiados.length === 0) return "Sin cambios en los datos generales (revisa organológico/medidas/vínculos)";
   return `Campos modificados: ${cambiados.join(", ")}`;
 }
+
+/**
+ * Colapsa entradas consecutivas idénticas (misma acción, mismos
+ * old_data/new_data) ocurridas a pocos segundos de diferencia — un
+ * doble clic al guardar, o un reintento de red, insertan dos filas
+ * reales en audit_log (es un insert puro, no idempotente como el
+ * resto del guardado), pero para quien lee el historial es un solo
+ * cambio. `entradas` debe venir ordenada de más reciente a más
+ * antigua (como devuelve fetchHistorialPieza).
+ */
+export function deduplicarEntradas(entradas: EntradaAuditLog[]): EntradaAuditLog[] {
+  const VENTANA_MS = 10_000;
+  const resultado: EntradaAuditLog[] = [];
+
+  for (const entrada of entradas) {
+    const anterior = resultado[resultado.length - 1];
+    const esDuplicado =
+      anterior &&
+      anterior.accion === entrada.accion &&
+      JSON.stringify(anterior.old_data) === JSON.stringify(entrada.old_data) &&
+      JSON.stringify(anterior.new_data) === JSON.stringify(entrada.new_data) &&
+      Math.abs(new Date(anterior.changed_at).getTime() - new Date(entrada.changed_at).getTime()) < VENTANA_MS;
+
+    if (!esDuplicado) resultado.push(entrada);
+  }
+
+  return resultado;
+}
