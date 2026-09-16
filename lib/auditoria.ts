@@ -63,28 +63,33 @@ export function resumirCambios(entrada: EntradaAuditLog): string {
 }
 
 /**
- * Colapsa entradas consecutivas idénticas (misma acción, mismos
- * old_data/new_data) ocurridas a pocos segundos de diferencia — un
- * doble clic al guardar, o un reintento de red, insertan dos filas
- * reales en audit_log (es un insert puro, no idempotente como el
- * resto del guardado), pero para quien lee el historial es un solo
- * cambio. `entradas` debe venir ordenada de más reciente a más
- * antigua (como devuelve fetchHistorialPieza).
+ * Colapsa entradas consecutivas que describen el mismo cambio
+ * (mismo resumen + mismo correo) ocurridas a pocos segundos de
+ * diferencia. Compara por el resumen ya calculado, no por los
+ * campos crudos, porque si hubiera dos triggers escribiendo en
+ * audit_log para el mismo UPDATE (ej. uno viejo que no llena
+ * `accion`, además del actual) los valores crudos no calzan exacto
+ * aunque describan el mismo cambio. `entradas` debe venir ordenada
+ * de más reciente a más antigua (como devuelve fetchHistorialPieza).
  */
 export function deduplicarEntradas(entradas: EntradaAuditLog[]): EntradaAuditLog[] {
   const VENTANA_MS = 10_000;
   const resultado: EntradaAuditLog[] = [];
+  let resumenAnterior = "";
 
   for (const entrada of entradas) {
     const anterior = resultado[resultado.length - 1];
+    const resumen = resumirCambios(entrada);
     const esDuplicado =
       anterior &&
-      anterior.accion === entrada.accion &&
-      JSON.stringify(anterior.old_data) === JSON.stringify(entrada.old_data) &&
-      JSON.stringify(anterior.new_data) === JSON.stringify(entrada.new_data) &&
+      resumen === resumenAnterior &&
+      anterior.changed_by_email === entrada.changed_by_email &&
       Math.abs(new Date(anterior.changed_at).getTime() - new Date(entrada.changed_at).getTime()) < VENTANA_MS;
 
-    if (!esDuplicado) resultado.push(entrada);
+    if (!esDuplicado) {
+      resultado.push(entrada);
+      resumenAnterior = resumen;
+    }
   }
 
   return resultado;
