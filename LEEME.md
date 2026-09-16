@@ -54,15 +54,21 @@ Abre `http://localhost:3000` — te va a llevar directo a `/piezas`.
   posterior.
 - Con sesión iniciada: botón "+ Nueva pieza" en el catálogo, y "✎ editar"
   en cada tarjeta de una ficha (abre el formulario ya en esa pestaña).
-  Prueba crear una pieza completa (las 5 pestañas), editarla, cambiarle
+  Prueba crear una pieza completa (las 6 pestañas), editarla, cambiarle
   la familia organológica, y eliminarla (soft delete — desaparece del
   catálogo pero sigue en la base).
+- Con sesión iniciada: switch "📦 Piezas / 📚 Papers" en la barra lateral
+  → entra a `/papers`, crea uno nuevo, y confirma que la cita se ve en la
+  ficha de cualquier pieza que lo vincule. Sin sesión, esa misma cita se
+  ve igual pero sin el link "Ver documento" (solo "🔒 solo
+  investigadores"), y `/papers` redirige a `/login` si lo visitas
+  directo por URL. Recuerda: el archivo real en Google Drive hay que
+  compartirlo aparte con las cuentas del equipo — la protección de la
+  app es solo para no mostrar el link, no reemplaza los permisos de
+  Drive.
 
 ## Qué falta (a propósito, para las próximas etapas)
 
-- Biblioteca de papers como sección propia (`/papers`) con links de Drive
-  protegidos — hoy los papers solo se crean/vinculan desde el formulario
-  de una pieza, y el link de Drive no está gateado por sesión todavía
 - Auditoría (bitácora de cambios), exportación a PDF/Excel
 - Fotos y audio reales (por ahora la ficha muestra un espacio vacío/
   placeholder) — falta conectar Supabase Storage

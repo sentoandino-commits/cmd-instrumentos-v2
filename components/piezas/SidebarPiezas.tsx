@@ -3,6 +3,7 @@ import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
 import FilterPanel from "@/components/FilterPanel";
 import PiezaCard from "@/components/PiezaCard";
+import SeccionSwitch from "@/components/SeccionSwitch";
 import { Pieza } from "@/lib/types";
 
 /**
@@ -23,6 +24,8 @@ export default function SidebarPiezas({
 }) {
   return (
     <aside className="w-72 shrink-0 space-y-3">
+      {puedeCrear && <SeccionSwitch activa="piezas" />}
+
       <Suspense fallback={<div className="h-10 rounded-lg bg-paperLight" />}>
         <SearchBar />
         <FilterPanel culturas={culturas} />

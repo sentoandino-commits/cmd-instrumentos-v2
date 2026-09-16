@@ -255,19 +255,41 @@ export default function PiezaDetailView({
               {papers.map((pp, i) => {
                 const p = pp.papers;
                 if (!p) return null;
+                const cita = (
+                  <span>
+                    {p.autores ? `${p.autores}. ` : ""}
+                    {p.anio ? `(${p.anio}). ` : ""}
+                    {p.titulo}
+                    {p.revista_o_fuente ? `. ${p.revista_o_fuente}.` : "."}
+                  </span>
+                );
                 return (
                   <div
                     key={i}
                     className="flex items-center justify-between gap-3 border-b border-line pb-2.5 text-sm text-ink last:border-0"
                   >
-                    <span>
-                      {p.autores ? `${p.autores}. ` : ""}
-                      {p.anio ? `(${p.anio}). ` : ""}
-                      {p.titulo}
-                      {p.revista_o_fuente ? `. ${p.revista_o_fuente}.` : "."}
-                    </span>
-                    <span className="shrink-0 whitespace-nowrap text-xs text-inkSoft">
-                      🔒 solo investigadores
+                    {puedeEditar ? (
+                      <Link href={`/papers/${p.id}`} className="hover:underline">
+                        {cita}
+                      </Link>
+                    ) : (
+                      cita
+                    )}
+                    <span className="shrink-0 whitespace-nowrap text-xs">
+                      {!puedeEditar ? (
+                        <span className="text-inkSoft">🔒 solo investigadores</span>
+                      ) : p.drive_url ? (
+                        <a
+                          href={p.drive_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-clay hover:underline"
+                        >
+                          Ver documento ↗
+                        </a>
+                      ) : (
+                        <span className="text-inkSoft">sin archivo</span>
+                      )}
                     </span>
                   </div>
                 );
